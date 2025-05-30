@@ -23,22 +23,18 @@ data class ApiKeyCreationResult(
     val name: String,
     val key: String,
     val createdAt: ZonedDateTime,
-    val expiresAt: ZonedDateTime?
+    val expiresAt: ZonedDateTime?,
 )
 
 @Service
 class ApiKeyService(
     private val apiKeyAdapter: ApiKeyAdapter,
     private val userAdapter: UserAdapter,
-    private val passwordEncoder: PasswordEncoder
+    private val passwordEncoder: PasswordEncoder,
 ) {
     @Transactional
     @Policy(Permission.API_KEY_CREATE)
-    fun createApiKey(
-        userId: String,
-        name: String,
-        expiresInDays: Int? = null
-    ): ApiKeyCreationResult {
+    fun createApiKey(userId: String, name: String, expiresInDays: Int? = null): ApiKeyCreationResult {
         try {
             userAdapter.findById(userId)
         } catch (e: EntityNotFound) {
@@ -74,7 +70,7 @@ class ApiKeyService(
             name = savedApiKey.name,
             key = keyValue,
             createdAt = savedApiKey.createdAt,
-            expiresAt = savedApiKey.expiresAt
+            expiresAt = savedApiKey.expiresAt,
         )
     }
 

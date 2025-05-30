@@ -1,23 +1,24 @@
 package dev.kviklet.kviklet.db
 
 import dev.kviklet.kviklet.db.util.BaseEntity
+import dev.kviklet.kviklet.security.Permission
+import dev.kviklet.kviklet.security.PolicyGrantedAuthority
 import dev.kviklet.kviklet.security.Resource
 import dev.kviklet.kviklet.security.SecuredDomainId
 import dev.kviklet.kviklet.security.SecuredDomainObject
 import dev.kviklet.kviklet.security.UserDetailsWithId
-import dev.kviklet.kviklet.security.Permission
-import dev.kviklet.kviklet.security.PolicyGrantedAuthority
 import dev.kviklet.kviklet.security.isAllowed
 import dev.kviklet.kviklet.security.vote
 import dev.kviklet.kviklet.service.EntityNotFound
-import jakarta.persistence.*
+import jakarta.persistence.Column
+import jakarta.persistence.Entity
+import jakarta.persistence.Table
 import org.springframework.data.jpa.repository.JpaRepository
+import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Repository
 import org.springframework.stereotype.Service
-import org.springframework.data.repository.findByIdOrNull
 import org.springframework.transaction.annotation.Transactional
 import java.io.Serializable
-import java.time.LocalDateTime
 import java.time.ZonedDateTime
 
 @Entity
@@ -47,7 +48,7 @@ class ApiKeyEntity : BaseEntity() {
         createdAt = createdAt,
         expiresAt = expiresAt,
         lastUsedAt = lastUsedAt,
-        userId = UserId(userId)
+        userId = UserId(userId),
     )
 }
 
@@ -56,7 +57,9 @@ interface ApiKeyRepository : JpaRepository<ApiKeyEntity, String> {
     fun findAllByUserId(userId: String): List<ApiKeyEntity>
 }
 
-data class ApiKeyId(private val id: String) : SecuredDomainId, Serializable {
+data class ApiKeyId(private val id: String) :
+    SecuredDomainId,
+    Serializable {
     override fun toString(): String = id
 }
 
@@ -80,7 +83,7 @@ data class ApiKey(
     override fun auth(
         permission: Permission,
         userDetails: UserDetailsWithId,
-        policies: List<PolicyGrantedAuthority>
+        policies: List<PolicyGrantedAuthority>,
     ): Boolean {
         if (permission.resource != Resource.API_KEY) {
             return false
@@ -97,19 +100,15 @@ data class ApiKey(
 @Service
 class ApiKeyAdapter(private val apiKeyRepository: ApiKeyRepository) {
     @Transactional(readOnly = true)
-    fun findById(id: ApiKeyId): ApiKey {
-        return apiKeyRepository.findByIdOrNull(id.toString())?.toDto()
-            ?: throw EntityNotFound("API Key not found", "API Key with id $id does not exist")
-    }
+    fun findById(id: ApiKeyId): ApiKey = apiKeyRepository.findByIdOrNull(id.toString())?.toDto()
+        ?: throw EntityNotFound("API Key not found", "API Key with id $id does not exist")
 
     @Transactional(readOnly = true)
-    fun findAllByUserId(userId: String): List<ApiKey> {
-        return apiKeyRepository.findAllByUserId(userId).map { it.toDto() }
-    }
+    fun findAllByUserId(userId: String): List<ApiKey> = apiKeyRepository.findAllByUserId(userId).map { it.toDto() }
 
     @Transactional
-    fun create(apiKey: ApiKey): ApiKey {
-        return apiKeyRepository.save(ApiKeyEntity().apply {
+    fun create(apiKey: ApiKey): ApiKey = apiKeyRepository.save(
+        ApiKeyEntity().apply {
             this.name = apiKey.name
             this.createdAt = apiKey.createdAt
             this.expiresAt = apiKey.expiresAt
@@ -119,15 +118,17 @@ class ApiKeyAdapter(private val apiKeyRepository: ApiKeyRepository) {
                 "API key ${apiKey.id} has no hash",
             )
             this.userId = apiKey.userId.toString()
-        }).toDto()
-    }
+        },
+    ).toDto()
 
     @Transactional
     fun updateLastUsed(id: String, lastUsedAt: ZonedDateTime) {
         val apiKey = apiKeyRepository.findByIdOrNull(id) ?: return
-        apiKeyRepository.save(apiKey.apply {
-            this.lastUsedAt = lastUsedAt
-        })
+        apiKeyRepository.save(
+            apiKey.apply {
+                this.lastUsedAt = lastUsedAt
+            },
+        )
     }
 
     @Transactional

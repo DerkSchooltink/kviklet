@@ -21,7 +21,7 @@ private const val API_KEY_HEADER = "X-API-Key"
 class ApiKeyAuthFilter(
     private val apiKeyService: ApiKeyService,
     private val userService: UserService,
-    private val passwordEncoder: PasswordEncoder
+    private val passwordEncoder: PasswordEncoder,
 ) : OncePerRequestFilter() {
     override fun doFilterInternal(request: HttpServletRequest, response: HttpServletResponse, chain: FilterChain) {
         val apiKey = request.getHeader(API_KEY_HEADER)
@@ -57,7 +57,7 @@ class ApiKeyAuthFilter(
             val user = userService.getUser(apiKeyEntity.userId)
             val userId = user.getId() ?: throw EntityNotFound(
                 "User not found",
-                "User with ID ${apiKeyEntity.userId} not found"
+                "User with ID ${apiKeyEntity.userId} not found",
             )
 
             // Create authentication token
