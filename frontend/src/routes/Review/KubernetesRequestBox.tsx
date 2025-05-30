@@ -28,9 +28,7 @@ const KubernetesRequestBox: FC<KubernetesRequestBoxProps> = ({
     setCommand(request?.command || "");
   }, [request?.command]);
 
-  const changeCommand = async (
-    e: MouseEvent<HTMLButtonElement>,
-  ) => {
+  const changeCommand = async (e: MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
     await updateRequest({ command: command });
     setEditMode(false);

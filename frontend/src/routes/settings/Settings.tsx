@@ -133,7 +133,7 @@ const Settings = () => {
         </div>
       ),
       link: "/settings/api-keys",
-    }
+    },
   ];
 
   return (

@@ -4,7 +4,7 @@ import {
   ApiKeyWithSecretResponse,
   listApiKeys,
   createApiKey,
-  deleteApiKey
+  deleteApiKey,
 } from "../../api/ApiKeyApi";
 import { Error, Success } from "../../components/Alert";
 import { format } from "date-fns";
@@ -13,7 +13,7 @@ import {
   TrashIcon,
   ClipboardIcon,
   CheckIcon,
-  ExclamationTriangleIcon
+  ExclamationTriangleIcon,
 } from "@heroicons/react/24/outline";
 import { isApiErrorResponse } from "../../api/Errors";
 import useNotification from "../../hooks/useNotification";
@@ -26,7 +26,9 @@ export default function ApiKeyPage() {
   const [showCreateForm, setShowCreateForm] = useState(false);
   const [newKeyName, setNewKeyName] = useState("");
   const [expiresInDays, setExpiresInDays] = useState<number | null>(30);
-  const [newApiKey, setNewApiKey] = useState<ApiKeyWithSecretResponse | null>(null);
+  const [newApiKey, setNewApiKey] = useState<ApiKeyWithSecretResponse | null>(
+    null,
+  );
   const [copied, setCopied] = useState(false);
   const [deleteConfirmId, setDeleteConfirmId] = useState<string | null>(null);
 
@@ -46,7 +48,7 @@ export default function ApiKeyPage() {
         addNotification({
           title: "Failed to load API keys",
           text: response.message,
-          type: "error"
+          type: "error",
         });
       } else {
         setApiKeys(response.apiKeys);
@@ -71,13 +73,13 @@ export default function ApiKeyPage() {
       setError(null);
       const createdKey = await createApiKey({
         name: newKeyName.trim(),
-        expiresInDays: expiresInDays
+        expiresInDays: expiresInDays,
       });
       if (isApiErrorResponse(createdKey)) {
         addNotification({
           title: "Failed to create API key",
           text: createdKey.message,
-          type: "error"
+          type: "error",
         });
       } else {
         setNewApiKey(createdKey);
@@ -118,7 +120,7 @@ export default function ApiKeyPage() {
       },
       () => {
         setError("Failed to copy to clipboard");
-      }
+      },
     );
   };
 
@@ -134,14 +136,14 @@ export default function ApiKeyPage() {
 
   return (
     <div className="container mx-auto px-4 py-8">
-      <div className="flex justify-between items-center mb-6">
+      <div className="mb-6 flex items-center justify-between">
         <h1 className="text-2xl font-bold">API Keys</h1>
         {!showCreateForm && !newApiKey && (
           <button
             onClick={() => setShowCreateForm(true)}
-            className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded flex items-center"
+            className="flex items-center rounded bg-blue-600 px-4 py-2 text-white hover:bg-blue-700"
           >
-            <PlusIcon className="h-5 w-5 mr-2" />
+            <PlusIcon className="mr-2 h-5 w-5" />
             Create API Key
           </button>
         )}
@@ -151,9 +153,11 @@ export default function ApiKeyPage() {
       {success && <Success>{success}</Success>}
 
       {newApiKey && (
-        <div className="mb-8 p-4 border border-green-300 bg-green-50 rounded-md dark:bg-green-900/20 dark:border-green-700">
-          <div className="flex justify-between items-center mb-2">
-            <h2 className="text-lg font-semibold text-green-800 dark:text-green-300">API Key Created</h2>
+        <div className="mb-8 rounded-md border border-green-300 bg-green-50 p-4 dark:border-green-700 dark:bg-green-900/20">
+          <div className="mb-2 flex items-center justify-between">
+            <h2 className="text-lg font-semibold text-green-800 dark:text-green-300">
+              API Key Created
+            </h2>
             <button
               onClick={() => setNewApiKey(null)}
               className="text-green-800 hover:text-green-900 dark:text-green-300 dark:hover:text-green-200"
@@ -162,29 +166,37 @@ export default function ApiKeyPage() {
             </button>
           </div>
           <p className="mb-2 text-sm text-green-700 dark:text-green-300">
-            Make sure to copy your API key now. You won't be able to see it again!
+            Make sure to copy your API key now. You won't be able to see it
+            again!
           </p>
           <div className="flex items-center">
-            <code className="bg-white p-2 rounded border flex-grow font-mono text-sm dark:bg-slate-800 dark:border-slate-700">
+            <code className="flex-grow rounded border bg-white p-2 font-mono text-sm dark:border-slate-700 dark:bg-slate-800">
               {newApiKey.key}
             </code>
             <button
               onClick={() => copyToClipboard(newApiKey.key)}
-              className="ml-2 p-2 bg-green-600 hover:bg-green-700 text-white rounded"
+              className="ml-2 rounded bg-green-600 p-2 text-white hover:bg-green-700"
               title="Copy to clipboard"
             >
-              {copied ? <CheckIcon className="h-5 w-5" /> : <ClipboardIcon className="h-5 w-5" />}
+              {copied ? (
+                <CheckIcon className="h-5 w-5" />
+              ) : (
+                <ClipboardIcon className="h-5 w-5" />
+              )}
             </button>
           </div>
         </div>
       )}
 
       {showCreateForm && (
-        <div className="mb-8 p-4 border rounded-md bg-gray-50 dark:bg-slate-800/50 dark:border-slate-700">
-          <h2 className="text-lg font-semibold mb-4">Create New API Key</h2>
+        <div className="mb-8 rounded-md border bg-gray-50 p-4 dark:border-slate-700 dark:bg-slate-800/50">
+          <h2 className="mb-4 text-lg font-semibold">Create New API Key</h2>
           <form onSubmit={(event) => void handleCreateKey(event)}>
             <div className="mb-4">
-              <label htmlFor="keyName" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+              <label
+                htmlFor="keyName"
+                className="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-300"
+              >
                 Key Name
               </label>
               <input
@@ -192,13 +204,16 @@ export default function ApiKeyPage() {
                 id="keyName"
                 value={newKeyName}
                 onChange={(e) => setNewKeyName(e.target.value)}
-                className="w-full p-2 border rounded dark:bg-slate-700 dark:border-slate-600"
+                className="w-full rounded border p-2 dark:border-slate-600 dark:bg-slate-700"
                 placeholder="My API Key"
                 required
               />
             </div>
             <div className="mb-4">
-              <label htmlFor="expiration" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+              <label
+                htmlFor="expiration"
+                className="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-300"
+              >
                 Expires In (Days)
               </label>
               <select
@@ -208,7 +223,7 @@ export default function ApiKeyPage() {
                   const val = e.target.value;
                   setExpiresInDays(val === "" ? null : parseInt(val, 10));
                 }}
-                className="w-full p-2 border rounded dark:bg-slate-700 dark:border-slate-600"
+                className="w-full rounded border p-2 dark:border-slate-600 dark:bg-slate-700"
               >
                 <option value="">Never</option>
                 <option value="7">7 days</option>
@@ -221,13 +236,13 @@ export default function ApiKeyPage() {
               <button
                 type="button"
                 onClick={() => setShowCreateForm(false)}
-                className="px-4 py-2 border rounded hover:bg-gray-100 dark:border-slate-600 dark:hover:bg-slate-700"
+                className="rounded border px-4 py-2 hover:bg-gray-100 dark:border-slate-600 dark:hover:bg-slate-700"
               >
                 Cancel
               </button>
               <button
                 type="submit"
-                className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+                className="rounded bg-blue-600 px-4 py-2 text-white hover:bg-blue-700"
                 disabled={loading}
               >
                 {loading ? "Creating..." : "Create"}
@@ -238,86 +253,99 @@ export default function ApiKeyPage() {
       )}
 
       {loading && !newApiKey && !showCreateForm ? (
-        <div className="text-center py-8">Loading...</div>
+        <div className="py-8 text-center">Loading...</div>
       ) : apiKeys.length === 0 ? (
-        <div className="text-center py-8 text-gray-500 dark:text-gray-400">
+        <div className="py-8 text-center text-gray-500 dark:text-gray-400">
           No API keys found. Create one to get started.
         </div>
       ) : (
         <div className="overflow-x-auto">
-          <table className="min-w-full bg-white border rounded-lg overflow-hidden dark:bg-slate-800 dark:border-slate-700">
+          <table className="min-w-full overflow-hidden rounded-lg border bg-white dark:border-slate-700 dark:bg-slate-800">
             <thead className="bg-gray-50 dark:bg-slate-700">
-            <tr>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-gray-300">
-                Name
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-gray-300">
-                Created
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-gray-300">
-                Expires
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-gray-300">
-                Last Used
-              </th>
-              <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-gray-300">
-                Actions
-              </th>
-            </tr>
+              <tr>
+                <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-300">
+                  Name
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-300">
+                  Created
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-300">
+                  Expires
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-300">
+                  Last Used
+                </th>
+                <th className="px-6 py-3 text-right text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-300">
+                  Actions
+                </th>
+              </tr>
             </thead>
             <tbody className="divide-y divide-gray-200 dark:divide-slate-700">
-            {apiKeys.map((key) => (
-              <tr key={key.id} className="hover:bg-gray-50 dark:hover:bg-slate-700/50">
-                <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-gray-200">
-                  {key.name}
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
-                  {formatDate(key.createdAt)}
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm">
-                  {key.expiresAt ? (
-                    <span className={isExpired(key.expiresAt) ? "text-red-500 dark:text-red-400" : "text-gray-500 dark:text-gray-400"}>
+              {apiKeys.map((key) => (
+                <tr
+                  key={key.id}
+                  className="hover:bg-gray-50 dark:hover:bg-slate-700/50"
+                >
+                  <td className="whitespace-nowrap px-6 py-4 text-sm font-medium text-gray-900 dark:text-gray-200">
+                    {key.name}
+                  </td>
+                  <td className="whitespace-nowrap px-6 py-4 text-sm text-gray-500 dark:text-gray-400">
+                    {formatDate(key.createdAt)}
+                  </td>
+                  <td className="whitespace-nowrap px-6 py-4 text-sm">
+                    {key.expiresAt ? (
+                      <span
+                        className={
+                          isExpired(key.expiresAt)
+                            ? "text-red-500 dark:text-red-400"
+                            : "text-gray-500 dark:text-gray-400"
+                        }
+                      >
                         {isExpired(key.expiresAt) && (
-                          <ExclamationTriangleIcon className="inline h-4 w-4 mr-1" />
+                          <ExclamationTriangleIcon className="mr-1 inline h-4 w-4" />
                         )}
-                      {formatDate(key.expiresAt)}
+                        {formatDate(key.expiresAt)}
                       </span>
-                  ) : (
-                    <span className="text-gray-500 dark:text-gray-400">Never</span>
-                  )}
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
-                  {formatDate(key.lastUsedAt)}
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                  {deleteConfirmId === key.id ? (
-                    <div className="flex items-center justify-end space-x-2">
-                      <span className="text-xs text-red-600 dark:text-red-400">Confirm?</span>
+                    ) : (
+                      <span className="text-gray-500 dark:text-gray-400">
+                        Never
+                      </span>
+                    )}
+                  </td>
+                  <td className="whitespace-nowrap px-6 py-4 text-sm text-gray-500 dark:text-gray-400">
+                    {formatDate(key.lastUsedAt)}
+                  </td>
+                  <td className="whitespace-nowrap px-6 py-4 text-right text-sm font-medium">
+                    {deleteConfirmId === key.id ? (
+                      <div className="flex items-center justify-end space-x-2">
+                        <span className="text-xs text-red-600 dark:text-red-400">
+                          Confirm?
+                        </span>
+                        <button
+                          onClick={() => void handleDeleteKey(key.id)}
+                          className="text-red-600 hover:text-red-900 dark:text-red-400 dark:hover:text-red-300"
+                        >
+                          Yes
+                        </button>
+                        <button
+                          onClick={() => setDeleteConfirmId(null)}
+                          className="text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-300"
+                        >
+                          No
+                        </button>
+                      </div>
+                    ) : (
                       <button
-                        onClick={() => void handleDeleteKey(key.id)}
+                        onClick={() => setDeleteConfirmId(key.id)}
                         className="text-red-600 hover:text-red-900 dark:text-red-400 dark:hover:text-red-300"
+                        title="Delete API Key"
                       >
-                        Yes
+                        <TrashIcon className="h-5 w-5" />
                       </button>
-                      <button
-                        onClick={() => setDeleteConfirmId(null)}
-                        className="text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-300"
-                      >
-                        No
-                      </button>
-                    </div>
-                  ) : (
-                    <button
-                      onClick={() => setDeleteConfirmId(key.id)}
-                      className="text-red-600 hover:text-red-900 dark:text-red-400 dark:hover:text-red-300"
-                      title="Delete API Key"
-                    >
-                      <TrashIcon className="h-5 w-5" />
-                    </button>
-                  )}
-                </td>
-              </tr>
-            ))}
+                    )}
+                  </td>
+                </tr>
+              ))}
             </tbody>
           </table>
         </div>

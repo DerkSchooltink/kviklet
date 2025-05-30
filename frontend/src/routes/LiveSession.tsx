@@ -1,8 +1,15 @@
 import { useContext, useEffect, useRef, useState, MouseEvent } from "react";
-import { ExecuteResponseResult, ExecutionRequestResponseWithComments, runQuery } from "../api/ExecutionRequestApi";
+import {
+  ExecuteResponseResult,
+  ExecutionRequestResponseWithComments,
+  runQuery,
+} from "../api/ExecutionRequestApi";
 import Button from "../components/Button";
 import * as monaco from "monaco-editor/esm/vs/editor/editor.api";
-import { ThemeContext, ThemeStatusContext } from "../components/ThemeStatusProvider";
+import {
+  ThemeContext,
+  ThemeStatusContext,
+} from "../components/ThemeStatusProvider";
 import Spinner from "../components/Spinner";
 import { useParams } from "react-router-dom";
 import MultiResult from "../components/MultiResult";

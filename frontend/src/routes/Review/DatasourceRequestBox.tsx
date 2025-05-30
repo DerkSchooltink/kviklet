@@ -34,9 +34,7 @@ function DatasourceRequestBox({
   const [showSQLDumpModal, setShowSQLDumpModal] = useState(false);
   const navigate = useNavigate();
   const [statement, setStatement] = useState(request?.statement || "");
-  const changeStatement = async (
-    e: MouseEvent<HTMLButtonElement>
-  ) => {
+  const changeStatement = async (e: MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
     await updateRequest({ statement });
     setEditMode(false);
