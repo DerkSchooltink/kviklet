@@ -1,16 +1,8 @@
-import { useContext, useEffect, useRef, useState } from "react";
-import {
-  ExecuteResponseResult,
-  ExecutionRequestResponseWithComments,
-  runQuery,
-} from "../api/ExecutionRequestApi";
+import { useContext, useEffect, useRef, useState, MouseEvent } from "react";
+import { ExecuteResponseResult, ExecutionRequestResponseWithComments, runQuery } from "../api/ExecutionRequestApi";
 import Button from "../components/Button";
-
 import * as monaco from "monaco-editor/esm/vs/editor/editor.api";
-import {
-  ThemeContext,
-  ThemeStatusContext,
-} from "../components/ThemeStatusProvider";
+import { ThemeContext, ThemeStatusContext } from "../components/ThemeStatusProvider";
 import Spinner from "../components/Spinner";
 import { useParams } from "react-router-dom";
 import MultiResult from "../components/MultiResult";
@@ -71,7 +63,7 @@ const Editor = ({
       setEditor((editor) => {
         if (editor) return editor;
 
-        const newEditor = monaco.editor.create(monacoEl.current!, {
+        return monaco.editor.create(monacoEl.current!, {
           value: "",
           language: language,
           suggest: {
@@ -81,7 +73,6 @@ const Editor = ({
           automaticLayout: true,
           minimap: { enabled: false },
         });
-        return newEditor;
       });
     }
 
@@ -92,7 +83,7 @@ const Editor = ({
   });
   monaco.editor.setTheme(theme);
 
-  const handleClick = (event: React.MouseEvent<HTMLAnchorElement>) => {
+  const handleClick = (event: MouseEvent<HTMLAnchorElement>) => {
     event.preventDefault();
 
     const selection = editor?.getSelection();
@@ -100,11 +91,9 @@ const Editor = ({
       (selection && editor?.getModel()?.getValueInRange(selection)) ||
       editor?.getValue();
 
-    const downloadUrl = `${baseUrl}/execution-requests/${
+    window.location.href = `${baseUrl}/execution-requests/${
       request.id
     }/download?query=${encodeURIComponent(query || "")}`;
-
-    window.location.href = downloadUrl;
   };
 
   const executeQuery = async () => {

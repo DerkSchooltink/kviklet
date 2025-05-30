@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, MouseEvent } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   DatasourceExecutionRequestResponseWithComments,
@@ -35,7 +35,7 @@ function DatasourceRequestBox({
   const navigate = useNavigate();
   const [statement, setStatement] = useState(request?.statement || "");
   const changeStatement = async (
-    e: React.MouseEvent<HTMLButtonElement, MouseEvent>,
+    e: MouseEvent<HTMLButtonElement>
   ) => {
     e.preventDefault();
     await updateRequest({ statement });
