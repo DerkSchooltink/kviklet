@@ -5,7 +5,7 @@ COPY --chown=gradle:gradle ./backend .
 
 RUN gradle --version --no-daemon
 
-RUN gradle build  -x kaptTestKotlin -x compileTestKotlin -x test --no-daemon
+RUN ./gradlew assemble --no-daemon
 
 FROM node:22 AS build-frontend
 WORKDIR /app
