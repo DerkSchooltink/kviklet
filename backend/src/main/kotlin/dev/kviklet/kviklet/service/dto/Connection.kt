@@ -54,6 +54,7 @@ sealed class Connection(
     open val description: String,
     open val reviewConfig: ReviewConfig,
     open val maxExecutions: Int?,
+    open val referenceRequired: Boolean,
 ) : SecuredDomainObject {
 
     fun getId() = id.toString()
@@ -79,6 +80,7 @@ data class DatasourceConnection(
     override val description: String,
     override val reviewConfig: ReviewConfig,
     override val maxExecutions: Int?,
+    override val referenceRequired: Boolean,
     val databaseName: String?,
     val authenticationType: AuthenticationType,
     val auth: AuthenticationDetails,
@@ -91,7 +93,7 @@ data class DatasourceConnection(
     val temporaryAccessEnabled: Boolean,
     val explainEnabled: Boolean,
     val maxTemporaryAccessDuration: Long? = null,
-) : Connection(id, displayName, description, reviewConfig, maxExecutions) {
+) : Connection(id, displayName, description, reviewConfig, maxExecutions, referenceRequired) {
     fun getConnectionString(): String = when (auth) {
         is AuthenticationDetails.UserPassword -> when (type) {
             DatasourceType.POSTGRESQL ->
@@ -150,4 +152,5 @@ data class KubernetesConnection(
     override val description: String,
     override val reviewConfig: ReviewConfig,
     override val maxExecutions: Int?,
-) : Connection(id, displayName, description, reviewConfig, maxExecutions)
+    override val referenceRequired: Boolean,
+) : Connection(id, displayName, description, reviewConfig, maxExecutions, referenceRequired)

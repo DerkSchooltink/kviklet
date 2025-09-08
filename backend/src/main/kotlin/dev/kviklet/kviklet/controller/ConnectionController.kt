@@ -53,6 +53,8 @@ data class CreateKubernetesConnectionRequest(
     val reviewConfig: ReviewConfigRequest,
 
     val maxExecutions: Int? = null,
+
+    val referenceRequired: Boolean,
 ) : ConnectionRequest()
 
 data class CreateDatasourceConnectionRequest(
@@ -94,6 +96,7 @@ data class CreateDatasourceConnectionRequest(
     val roleArn: String? = null,
     @field:Min(1)
     val maxTemporaryAccessDuration: Long? = null,
+    val referenceRequired: Boolean,
 ) : ConnectionRequest()
 
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "connectionType")
@@ -151,6 +154,8 @@ data class UpdateDatasourceConnectionRequest(
     // Using an extra clear flag because the patch requests don't differentiate between
     // null and not present.
     val clearMaxTempDuration: Boolean = false,
+
+    val referenceRequired: Boolean? = null,
 ) : UpdateConnectionRequest()
 
 data class UpdateKubernetesConnectionRequest(
@@ -163,6 +168,8 @@ data class UpdateKubernetesConnectionRequest(
     val reviewConfig: ReviewConfigRequest? = null,
 
     val maxExecutions: Int? = null,
+
+    val referenceRequired: Boolean? = null,
 ) : UpdateConnectionRequest()
 
 data class ReviewConfigRequest(val numTotalRequired: Int = 0)
@@ -202,6 +209,7 @@ data class DatasourceConnectionResponse(
     val explainEnabled: Boolean,
     val roleArn: String?,
     val maxTemporaryAccessDuration: Long?,
+    val referenceRequired: Boolean,
 ) : ConnectionResponse(ConnectionType.DATASOURCE) {
     companion object {
         fun fromDto(datasourceConnection: DatasourceConnection) = DatasourceConnectionResponse(
@@ -228,6 +236,7 @@ data class DatasourceConnectionResponse(
                 else -> null
             },
             maxTemporaryAccessDuration = datasourceConnection.maxTemporaryAccessDuration,
+            referenceRequired = datasourceConnection.referenceRequired,
         )
     }
 }
@@ -238,6 +247,7 @@ data class KubernetesConnectionResponse(
     val description: String,
     val reviewConfig: ReviewConfigResponse,
     val maxExecutions: Int?,
+    val referenceRequired: Boolean,
 ) : ConnectionResponse(connectionType = ConnectionType.KUBERNETES) {
     companion object {
         fun fromDto(kubernetesConnection: KubernetesConnection) = KubernetesConnectionResponse(
@@ -248,6 +258,7 @@ data class KubernetesConnectionResponse(
                 kubernetesConnection.reviewConfig.numTotalRequired,
             ),
             maxExecutions = kubernetesConnection.maxExecutions,
+            referenceRequired = kubernetesConnection.referenceRequired,
         )
     }
 }
@@ -297,6 +308,7 @@ class ConnectionController(val connectionService: ConnectionService) {
             explainEnabled = request.explainEnabled,
             roleArn = request.roleArn,
             maxTemporaryAccessDuration = request.maxTemporaryAccessDuration,
+            referenceRequired = request.referenceRequired,
         )
 
     private fun testDatabaseConnection(request: CreateDatasourceConnectionRequest): TestConnectionResult =
@@ -320,6 +332,7 @@ class ConnectionController(val connectionService: ConnectionService) {
             explainEnabled = request.explainEnabled,
             roleArn = request.roleArn,
             maxTemporaryAccessDuration = request.maxTemporaryAccessDuration,
+            referenceRequired = request.referenceRequired,
         )
 
     private fun createKubernetesConnection(request: CreateKubernetesConnectionRequest): Connection =
@@ -329,6 +342,7 @@ class ConnectionController(val connectionService: ConnectionService) {
             description = request.description,
             reviewsRequired = request.reviewConfig.numTotalRequired,
             maxExecutions = request.maxExecutions,
+            referenceRequired = request.referenceRequired,
         )
 
     @PostMapping("/")

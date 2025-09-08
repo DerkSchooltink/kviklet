@@ -1,0 +1,21 @@
+databaseChangeLog:
+  - changeSet:
+      id: 033-add-optional-reference
+      author: DerkSchooltink
+      changes:
+        - addColumn:
+            tableName: connection
+            columns:
+              - column:
+                  name: reference_required
+                  type: BOOLEAN
+                  defaultValue: false
+        - addColumn:
+            tableName: execution_request
+            columns:
+              - column:
+                  name: reference
+                  type: VARCHAR(255)
+                  defaultValue: null
+                  constraints:
+                    nullable: true

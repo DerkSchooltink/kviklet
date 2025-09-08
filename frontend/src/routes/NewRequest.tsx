@@ -61,6 +61,7 @@ const DatasourceExecutionRequestSchema = z
     statement: z.string().optional(),
     connectionId: z.string().min(1),
     temporaryAccessDuration: z.coerce.number().nullable().optional(),
+    reference: z.string().optional(),
   })
   .refine(
     (data) =>
@@ -91,6 +92,7 @@ const KubernetesExecutionRequestSchema = z
     podName: z.string().min(1),
     containerName: z.string().optional(),
     temporaryAccessDuration: z.coerce.number().nullable().optional(),
+    reference: z.string().optional(),
   })
   .refine(
     (data) =>
@@ -133,6 +135,7 @@ interface PreConfiguredStateKubernetes {
   containerName: string;
   podName: string;
   temporaryAccessDuration: number;
+  reference: string;
 }
 
 interface PreConfiguredStateDatasource {
@@ -143,6 +146,7 @@ interface PreConfiguredStateDatasource {
   description: string;
   statement: string;
   temporaryAccessDuration: number;
+  reference: string;
 }
 
 type PreConfiguredState =
@@ -327,6 +331,7 @@ const DatasourceExecutionRequestForm = ({
       setValue("title", state.title);
       setValue("description", state.description);
       setValue("statement", state.statement);
+      setValue("reference", state.reference);
     }
     if (mode === "TemporaryAccess") {
       setValue("temporaryAccessDuration", 60);
@@ -507,6 +512,31 @@ const DatasourceExecutionRequestForm = ({
             )}
           </div>
         )}
+        {connection.referenceRequired === true && (
+          <div className="my-3 rounded-md px-3 pb-1.5 pt-2.5 shadow-sm ring-1 ring-inset ring-slate-300 focus-within:ring-2 focus-within:ring-indigo-600 dark:ring-slate-700">
+            <label
+              htmlFor="reference-input"
+              className="block text-xs font-medium text-slate-900 dark:text-slate-50"
+            >
+              Reference <span className="text-red-500">*</span>
+            </label>
+            <input
+              className="block w-full bg-slate-50 p-0 text-slate-900 ring-0 placeholder:text-slate-400 focus:ring-0 focus-visible:outline-none dark:bg-slate-950 dark:text-slate-50 sm:text-sm sm:leading-6"
+              id="reference-input"
+              type="text"
+              placeholder="JIRA-1234"
+              data-testid="request-reference"
+              {...register("reference", {
+                required: connection.referenceRequired,
+              })}
+            />
+            {errors.reference && (
+              <p className="mt-2 text-xs italic text-red-500">
+                {errors.reference?.message}
+              </p>
+            )}
+          </div>
+        )}
         <div className="-mx-3 mb-2 flex flex-wrap">
           <div className="mb-6 ml-auto px-3">
             <Button
@@ -589,6 +619,7 @@ const KubernetesExecutionRequestForm = ({
       setValue("namespace", state.namespace);
       setValue("podName", state.podName);
       setValue("containerName", state.containerName);
+      setValue("reference", state.reference);
     }
     if (mode === "TemporaryAccess") {
       setValue("temporaryAccessDuration", 60);
@@ -847,6 +878,31 @@ const KubernetesExecutionRequestForm = ({
               {errors.command && (
                 <p className="mt-2 text-xs italic text-red-500">
                   {errors.command?.message}
+                </p>
+              )}
+            </div>
+          )}
+          {connection.referenceRequired === true && (
+            <div className="my-3 rounded-md px-3 pb-1.5 pt-2.5 shadow-sm ring-1 ring-inset ring-slate-300 focus-within:ring-2 focus-within:ring-indigo-600 dark:ring-slate-700">
+              <label
+                htmlFor="reference-input"
+                className="block text-xs font-medium text-slate-900 dark:text-slate-50"
+              >
+                Reference <span className="text-red-500">*</span>
+              </label>
+              <input
+                className="block w-full bg-slate-50 p-0 text-slate-900 ring-0 placeholder:text-slate-400 focus:ring-0 focus-visible:outline-none dark:bg-slate-950 dark:text-slate-50 sm:text-sm sm:leading-6"
+                id="reference-input"
+                type="text"
+                placeholder="JIRA-1234"
+                data-testid="request-reference"
+                {...register("reference", {
+                  required: connection.referenceRequired,
+                })}
+              />
+              {errors.reference && (
+                <p className="mt-2 text-xs italic text-red-500">
+                  {errors.reference?.message}
                 </p>
               )}
             </div>

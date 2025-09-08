@@ -72,6 +72,7 @@ class ConnectionService(
             } else {
                 (request.maxTemporaryAccessDuration ?: connection.maxTemporaryAccessDuration)
             },
+            referenceRequired = request.referenceRequired ?: connection.referenceRequired,
         )
     }
 
@@ -88,6 +89,7 @@ class ConnectionService(
                         ?: (currentAuth as? AuthenticationDetails.UserPassword)?.password
                         ?: throw IllegalArgumentException("Password required for USER_PASSWORD authentication"),
                 )
+
                 AuthenticationType.AWS_IAM -> AuthenticationDetails.AwsIam(
                     username = request.username ?: currentAuth.username,
                     roleArn = request.roleArn ?: (currentAuth as? AuthenticationDetails.AwsIam)?.roleArn,
@@ -101,6 +103,7 @@ class ConnectionService(
                 username = request.username ?: currentAuth.username,
                 password = request.password ?: currentAuth.password,
             )
+
             is AuthenticationDetails.AwsIam -> currentAuth.copy(
                 username = request.username ?: currentAuth.username,
             )
@@ -125,6 +128,7 @@ class ConnectionService(
                 )
             } ?: connection.reviewConfig,
             request.maxExecutions ?: connection.maxExecutions,
+            request.referenceRequired ?: connection.referenceRequired,
         )
     }
 
@@ -166,31 +170,33 @@ class ConnectionService(
         explainEnabled: Boolean,
         roleArn: String?,
         maxTemporaryAccessDuration: Long?,
+        referenceRequired: Boolean,
     ): Connection {
         if (authenticationType == AuthenticationType.USER_PASSWORD && password == null) {
             throw IllegalArgumentException("Password is required for USER_PASSWORD authentication")
         }
         return connectionAdapter.createDatasourceConnection(
-            connectionId,
-            displayName,
-            authenticationType,
-            databaseName,
-            maxExecutions,
-            username,
-            password,
-            description,
-            ReviewConfig(
+            connectionId = connectionId,
+            displayName = displayName,
+            authenticationType = authenticationType,
+            databaseName = databaseName,
+            maxExecutions = maxExecutions,
+            username = username,
+            password = password,
+            description = description,
+            reviewConfig = ReviewConfig(
                 numTotalRequired = reviewsRequired,
             ),
-            port,
-            hostname,
-            type,
-            protocol,
-            additionalJDBCOptions,
-            dumpsEnabled,
-            temporaryAccessEnabled,
-            explainEnabled,
-            roleArn,
+            port = port,
+            hostname = hostname,
+            type = type,
+            protocol = protocol,
+            additionalJDBCOptions = additionalJDBCOptions,
+            dumpsEnabled = dumpsEnabled,
+            temporaryAccessEnabled = temporaryAccessEnabled,
+            explainEnabled = explainEnabled,
+            roleArn = roleArn,
+            referenceRequired = referenceRequired,
             maxTemporaryAccessDuration,
         )
     }
@@ -216,27 +222,29 @@ class ConnectionService(
         explainEnabled: Boolean,
         roleArn: String?,
         maxTemporaryAccessDuration: Long? = null,
+        referenceRequired: Boolean,
     ): TestConnectionResult {
         val connection = DatasourceConnection(
-            connectionId,
-            displayName,
-            description,
+            id = connectionId,
+            displayName = displayName,
+            description = description,
             reviewConfig = ReviewConfig(reviewsRequired),
-            maxExecutions,
-            databaseName,
-            authenticationType,
-            when (authenticationType) {
+            maxExecutions = maxExecutions,
+            databaseName = databaseName,
+            authenticationType = authenticationType,
+            auth = when (authenticationType) {
                 AuthenticationType.USER_PASSWORD -> AuthenticationDetails.UserPassword(username, password ?: "")
                 AuthenticationType.AWS_IAM -> AuthenticationDetails.AwsIam(username, roleArn)
             },
-            port,
-            hostname,
-            type,
-            protocol,
-            additionalJDBCOptions,
-            dumpsEnabled,
-            temporaryAccessEnabled,
-            explainEnabled,
+            port = port,
+            hostname = hostname,
+            type = type,
+            protocol = protocol,
+            additionalOptions = additionalJDBCOptions,
+            dumpsEnabled = dumpsEnabled,
+            temporaryAccessEnabled = temporaryAccessEnabled,
+            explainEnabled = explainEnabled,
+            referenceRequired = referenceRequired,
             maxTemporaryAccessDuration,
         )
         val accessibleDatabases = mutableListOf<String>()
@@ -249,6 +257,7 @@ class ConnectionService(
                     connectionString = connection.getConnectionString(),
                 )
             }
+
             else ->
                 JDBCExecutor.testCredentials(
                     connectionString = connection.getConnectionString(),
@@ -277,14 +286,16 @@ class ConnectionService(
         description: String,
         reviewsRequired: Int,
         maxExecutions: Int?,
+        referenceRequired: Boolean,
     ): Connection = connectionAdapter.createKubernetesConnection(
         connectionId,
-        displayName,
-        description,
-        ReviewConfig(
+        displayName = displayName,
+        description = description,
+        reviewConfig = ReviewConfig(
             numTotalRequired = reviewsRequired,
         ),
-        maxExecutions,
+        maxExecutions = maxExecutions,
+        referenceRequired = referenceRequired,
     )
 
     @Transactional

@@ -76,6 +76,8 @@ class ExecutionRequestEntity(
     var command: String? = "",
 
     var temporaryAccessDuration: Long? = null,
+    
+    var reference: String? = null,
 
 ) : BaseEntity() {
 
@@ -95,6 +97,7 @@ class ExecutionRequestEntity(
             createdAt = createdAt,
             author = author.toDto(),
             temporaryAccessDuration = temporaryAccessDuration?.let { Duration.ofMinutes(it) },
+            reference = reference,
         )
 
         ExecutionRequestType.KUBERNETES -> KubernetesExecutionRequest(
@@ -111,6 +114,7 @@ class ExecutionRequestEntity(
             containerName = containerName,
             command = command,
             temporaryAccessDuration = temporaryAccessDuration?.let { Duration.ofMinutes(it) },
+            reference = reference,
         )
     }
 
@@ -208,6 +212,7 @@ class ExecutionRequestAdapter(
         containerName: String? = null,
         command: String? = null,
         temporaryAccessDuration: Duration? = null,
+        reference: String? = null,
     ): ExecutionRequestDetails {
         val connection = connectionRepository.findByIdOrNull(connectionId.toString())
             ?: throw EntityNotFound("Connection Not Found", "Connection with id $connectionId does not exist.")
@@ -249,6 +254,7 @@ class ExecutionRequestAdapter(
                 containerName = containerName,
                 command = command,
                 temporaryAccessDuration = temporaryAccessDuration?.toMinutes(),
+                reference = reference,
             ),
         ).toDetailDto(
             connectionAdapter.toDto(connection),

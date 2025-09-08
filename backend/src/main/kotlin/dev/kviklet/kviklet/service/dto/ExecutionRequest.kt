@@ -55,6 +55,7 @@ sealed class ExecutionRequest(
     open val createdAt: LocalDateTime = utcTimeNow(),
     open val author: User,
     open val temporaryAccessDuration: Duration? = null,
+    open val reference: String? = null,
 ) : SecuredDomainObject {
     fun getId() = id.toString()
     override fun getSecuredObjectId() = connection.getSecuredObjectId()
@@ -95,10 +96,18 @@ data class DatasourceExecutionRequest(
     override val createdAt: LocalDateTime = utcTimeNow(),
     override val author: User,
     override val temporaryAccessDuration: Duration?,
+    override val reference: String?,
 ) : ExecutionRequest(
-    id, connection, title, type, description, executionStatus, createdAt,
-    author,
-    temporaryAccessDuration,
+    id = id,
+    connection = connection,
+    title = title,
+    type = type,
+    description = description,
+    executionStatus = executionStatus,
+    createdAt = createdAt,
+    author = author,
+    temporaryAccessDuration = temporaryAccessDuration,
+    reference = reference,
 )
 
 data class KubernetesExecutionRequest(
@@ -110,21 +119,23 @@ data class KubernetesExecutionRequest(
     override val executionStatus: String,
     override val createdAt: LocalDateTime = utcTimeNow(),
     override val author: User,
+    override val temporaryAccessDuration: Duration?,
+    override val reference: String?,
     val namespace: String?,
     val podName: String?,
     val containerName: String?,
     val command: String?,
-    override val temporaryAccessDuration: Duration?,
 ) : ExecutionRequest(
-    id,
-    connection,
-    title,
-    type,
-    description,
-    executionStatus,
-    createdAt,
-    author,
-    temporaryAccessDuration,
+    id = id,
+    connection = connection,
+    title = title,
+    type = type,
+    description = description,
+    executionStatus = executionStatus,
+    createdAt = createdAt,
+    author = author,
+    temporaryAccessDuration = temporaryAccessDuration,
+    reference = reference,
 )
 
 data class ExecutionRequestDetails(val request: ExecutionRequest, val events: MutableSet<Event>) :

@@ -50,6 +50,7 @@ const databaseConnectionResponseSchema = withType(
     explainEnabled: z.boolean(),
     roleArn: z.string().nullable(),
     maxTemporaryAccessDuration: z.number().nullable().optional(),
+    referenceRequired: z.boolean().optional(),
   }),
   "DATASOURCE",
 );
@@ -63,6 +64,7 @@ const kubernetesConnectionResponseSchema = withType(
       numTotalRequired: z.coerce.number(),
     }),
     maxExecutions: z.coerce.number().nullable(),
+    referenceRequired: z.boolean().optional(),
   }),
   "KUBERNETES",
 );

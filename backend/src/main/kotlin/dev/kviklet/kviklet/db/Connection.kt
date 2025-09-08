@@ -77,6 +77,7 @@ class ConnectionEntity(
     var dumpsEnabled: Boolean = false,
     var temporaryAccessEnabled: Boolean = true,
     var explainEnabled: Boolean = false,
+    var referenceRequired: Boolean = false,
     var roleArn: String? = null,
     var maxTemporaryAccessDuration: Long? = null,
 ) {
@@ -186,6 +187,7 @@ class ConnectionAdapter(
         explainEnabled: Boolean,
         roleArn: String? = null,
         maxTemporaryAccessDuration: Long? = null,
+        referenceRequired: Boolean,
     ): Connection = decryptCredentialsIfNeeded(
         save(
             ConnectionEntity(
@@ -210,6 +212,7 @@ class ConnectionAdapter(
                 explainEnabled = explainEnabled,
                 roleArn = roleArn,
                 maxTemporaryAccessDuration = maxTemporaryAccessDuration,
+                referenceRequired = referenceRequired,
             ),
         ),
     )
@@ -233,6 +236,7 @@ class ConnectionAdapter(
         explainEnabled: Boolean,
         roleArn: String? = null,
         maxTemporaryAccessDuration: Long? = null,
+        referenceRequired: Boolean,
     ): Connection {
         val datasourceConnection = connectionRepository.findByIdOrNull(id.toString())
             ?: throw EntityNotFound(
@@ -262,6 +266,7 @@ class ConnectionAdapter(
         datasourceConnection.dumpsEnabled = dumpsEnabled
         datasourceConnection.temporaryAccessEnabled = temporaryAccessEnabled
         datasourceConnection.explainEnabled = explainEnabled
+        datasourceConnection.referenceRequired = referenceRequired
         datasourceConnection.roleArn = roleArn
         datasourceConnection.maxTemporaryAccessDuration = maxTemporaryAccessDuration
 
@@ -274,6 +279,7 @@ class ConnectionAdapter(
         description: String,
         reviewConfig: ReviewConfig,
         maxExecutions: Int?,
+        referenceRequired: Boolean,
     ): Connection {
         val datasourceConnection = connectionRepository.findByIdOrNull(id.toString())
             ?: throw EntityNotFound(
@@ -287,6 +293,7 @@ class ConnectionAdapter(
         datasourceConnection.description = description
         datasourceConnection.reviewConfig = reviewConfig
         datasourceConnection.maxExecutions = maxExecutions
+        datasourceConnection.referenceRequired = referenceRequired
 
         return decryptCredentialsIfNeeded(save(datasourceConnection))
     }
@@ -298,6 +305,7 @@ class ConnectionAdapter(
         description: String,
         reviewConfig: ReviewConfig,
         maxExecutions: Int?,
+        referenceRequired: Boolean,
     ): Connection = decryptCredentialsIfNeeded(
         save(
             ConnectionEntity(
@@ -307,6 +315,7 @@ class ConnectionAdapter(
                 reviewConfig = reviewConfig,
                 connectionType = ConnectionType.KUBERNETES,
                 maxExecutions = maxExecutions,
+                referenceRequired = referenceRequired,
             ),
         ),
     )
@@ -336,6 +345,7 @@ class ConnectionAdapter(
                         username = connection.username!!,
                         password = connection.password!!,
                     )
+
                     AuthenticationType.AWS_IAM -> AuthenticationDetails.AwsIam(
                         username = connection.username!!,
                         roleArn = connection.roleArn,
@@ -352,7 +362,9 @@ class ConnectionAdapter(
                 temporaryAccessEnabled = connection.temporaryAccessEnabled,
                 explainEnabled = connection.explainEnabled,
                 maxTemporaryAccessDuration = connection.maxTemporaryAccessDuration,
+                referenceRequired = connection.referenceRequired,
             )
+
         ConnectionType.KUBERNETES ->
             KubernetesConnection(
                 id = ConnectionId(connection.id),
@@ -360,6 +372,7 @@ class ConnectionAdapter(
                 description = connection.description,
                 reviewConfig = connection.reviewConfig,
                 maxExecutions = connection.maxExecutions,
+                referenceRequired = connection.referenceRequired,
             )
     }
 }
