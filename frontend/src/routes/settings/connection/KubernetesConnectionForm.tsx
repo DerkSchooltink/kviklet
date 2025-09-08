@@ -14,6 +14,7 @@ const kubernetesConnectionPayloadSchema = z.object({
     numTotalRequired: z.coerce.number(),
   }),
   maxExecutions: z.coerce.number().nullable(),
+  referenceRequired: z.boolean().default(false),
 });
 
 type KubernetesConnectionPayload = z.infer<
@@ -45,6 +46,7 @@ export default function CreateKubernetesConnectionForm(props: {
   useEffect(() => {
     setValue("reviewConfig", { numTotalRequired: 1 });
     setValue("maxExecutions", 1);
+    setValue("referenceRequired", false);
   }, []);
 
   const onSubmit = async (data: KubernetesConnectionPayload) => {
@@ -95,6 +97,22 @@ export default function CreateKubernetesConnectionForm(props: {
             {...register("maxExecutions")}
             error={errors.maxExecutions?.message}
           />
+          <div className="flex items-center space-x-2 py-2">
+            <input
+              type="checkbox"
+              id="referenceRequired"
+              className="h-4 w-4"
+              {...register("referenceRequired")}
+              data-testid="reference-required-checkbox"
+            />
+            <label 
+              htmlFor="referenceRequired" 
+              className="text-sm font-medium text-slate-700 dark:text-slate-200"
+              title="When enabled, users must provide a reference when creating execution requests."
+            >
+              Reference Required
+            </label>
+          </div>
           <Button htmlType="submit" variant="primary">
             Create Connection
           </Button>

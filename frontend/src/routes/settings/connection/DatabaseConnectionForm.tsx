@@ -51,6 +51,7 @@ const baseConnectionSchema = z.object({
   temporaryAccessEnabled: z.boolean().default(true),
   explainEnabled: z.boolean().default(false),
   maxTemporaryAccessDuration: z.coerce.number().nullable().optional(),
+  referenceRequired: z.boolean().default(false),
   connectionType: z.literal("DATASOURCE").default("DATASOURCE"),
 });
 
@@ -174,6 +175,7 @@ export default function DatabaseConnectionForm(props: {
     setValue("dumpsEnabled", false);
     setValue("temporaryAccessEnabled", true);
     setValue("explainEnabled", false);
+    setValue("referenceRequired", false);
   }, []);
 
   const updatePortIfNotTouched = (port: number) => {
@@ -436,6 +438,23 @@ export default function DatabaseConnectionForm(props: {
                           type="checkbox"
                           className="my-auto h-4 w-4"
                           {...register("explainEnabled")}
+                        />
+                      </div>
+                      <div className="flex w-full justify-between">
+                        <label
+                          htmlFor="referenceRequired"
+                          className="my-auto mr-auto flex items-center text-sm font-medium text-slate-700 dark:text-slate-200"
+                          title="When enabled, users must provide a reference when creating execution requests."
+                        >
+                          Reference Required
+                          <QuestionMarkCircleIcon className="ml-1 h-4 w-4 text-slate-400"></QuestionMarkCircleIcon>
+                        </label>
+                        <input
+                          id="referenceRequired"
+                          type="checkbox"
+                          className="my-auto h-4 w-4"
+                          {...register("referenceRequired")}
+                          data-testid="reference-required-checkbox"
                         />
                       </div>
                       <TestingConnectionFragment

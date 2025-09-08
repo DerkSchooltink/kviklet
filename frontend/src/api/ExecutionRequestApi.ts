@@ -109,6 +109,7 @@ const RawDatasourceRequestSchema = z.object({
   csvDownload: CSVDownloadSchema.optional(),
   temporaryAccessDuration: z.number().nullable(),
   liveSessionEnabled: z.boolean().optional(),
+  reference: z.string().optional(),
 });
 
 const RawKubernetesRequestSchema = z.object({
@@ -128,6 +129,7 @@ const RawKubernetesRequestSchema = z.object({
   command: z.string().optional(),
   temporaryAccessDuration: z.number().optional(),
   liveSessionEnabled: z.boolean().optional(),
+  reference: z.string().optional(),
 });
 
 const ProxyResponse = z.object({

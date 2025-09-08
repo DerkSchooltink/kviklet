@@ -161,4 +161,60 @@ describe("DatabaseConnectionForm - Max Temporary Access Duration", () => {
       expect(screen.getByLabelText("Max Access Duration")).toBeInTheDocument();
     });
   });
+
+  test("reference required checkbox is unchecked by default", async () => {
+    render(
+      <DatabaseConnectionForm
+        createConnection={mockCreateConnection}
+        closeModal={mockCloseModal}
+      />,
+    );
+
+    // Open advanced options
+    fireEvent.click(screen.getByTestId("advanced-options-button"));
+
+    // Check that the reference required checkbox exists and is unchecked by default
+    const referenceRequiredCheckbox = screen.getByTestId("reference-required-checkbox");
+    expect(referenceRequiredCheckbox).toBeInTheDocument();
+    expect(referenceRequiredCheckbox).not.toBeChecked();
+  });
+
+  test("submits form with reference required value", async () => {
+    render(
+      <DatabaseConnectionForm
+        createConnection={mockCreateConnection}
+        closeModal={mockCloseModal}
+      />,
+    );
+
+    // Fill in required fields
+    userEvent.type(screen.getByTestId("connection-name"), "Test Connection");
+    userEvent.type(
+      screen.getByTestId("connection-description"),
+      "Test Description",
+    );
+    userEvent.type(screen.getByTestId("connection-hostname"), "localhost");
+    userEvent.type(screen.getByTestId("connection-username"), "testuser");
+    userEvent.type(screen.getByTestId("connection-password"), "testpass");
+
+    // Open advanced options
+    fireEvent.click(screen.getByTestId("advanced-options-button"));
+
+    // Check the reference required checkbox
+    const referenceRequiredCheckbox = screen.getByTestId("reference-required-checkbox");
+    fireEvent.click(referenceRequiredCheckbox);
+    expect(referenceRequiredCheckbox).toBeChecked();
+
+    // Submit form
+    const createButton = screen.getByTestId("create-connection-button");
+    fireEvent.click(createButton);
+
+    await waitFor(() => {
+      expect(mockCreateConnection).toHaveBeenCalledWith(
+        expect.objectContaining({
+          referenceRequired: true,
+        }),
+      );
+    });
+  });
 });

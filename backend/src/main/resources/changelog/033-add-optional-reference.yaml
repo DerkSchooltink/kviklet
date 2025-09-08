@@ -1,6 +1,7 @@
 databaseChangeLog:
   - changeSet:
       id: 033-add-optional-reference
+      runOnChange: true
       author: DerkSchooltink
       changes:
         - addColumn:

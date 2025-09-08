@@ -225,6 +225,11 @@ function DatasourceRequestBox({
             {timeSince(new Date(request?.createdAt ?? ""))}
           </div>
         </div>
+        {request?.reference && (
+          <div className="bg-slate-50 px-3 py-1 text-sm text-slate-700 dark:bg-slate-950 dark:text-slate-400">
+            <span className="font-medium">Reference:</span> {request.reference}
+          </div>
+        )}
         <div className="py-3">
           <p className="pb-6 text-slate-500">{request?.description}</p>
           {request?.type == "SingleExecution" ? (

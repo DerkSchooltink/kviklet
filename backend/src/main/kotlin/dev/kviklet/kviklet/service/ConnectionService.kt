@@ -197,7 +197,7 @@ class ConnectionService(
             explainEnabled = explainEnabled,
             roleArn = roleArn,
             referenceRequired = referenceRequired,
-            maxTemporaryAccessDuration,
+            maxTemporaryAccessDuration = maxTemporaryAccessDuration,
         )
     }
 
@@ -245,7 +245,7 @@ class ConnectionService(
             temporaryAccessEnabled = temporaryAccessEnabled,
             explainEnabled = explainEnabled,
             referenceRequired = referenceRequired,
-            maxTemporaryAccessDuration,
+            maxTemporaryAccessDuration = maxTemporaryAccessDuration,
         )
         val accessibleDatabases = mutableListOf<String>()
         if (!databaseName.isNullOrBlank()) {

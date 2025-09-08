@@ -524,10 +524,10 @@ const DatasourceExecutionRequestForm = ({
               className="block w-full bg-slate-50 p-0 text-slate-900 ring-0 placeholder:text-slate-400 focus:ring-0 focus-visible:outline-none dark:bg-slate-950 dark:text-slate-50 sm:text-sm sm:leading-6"
               id="reference-input"
               type="text"
-              placeholder="JIRA-1234"
+              placeholder="ISSUE-1234"
               data-testid="request-reference"
               {...register("reference", {
-                required: connection.referenceRequired,
+                required: connection.referenceRequired ? "Reference is required" : false,
               })}
             />
             {errors.reference && (
@@ -897,7 +897,7 @@ const KubernetesExecutionRequestForm = ({
                 placeholder="JIRA-1234"
                 data-testid="request-reference"
                 {...register("reference", {
-                  required: connection.referenceRequired,
+                  required: connection.referenceRequired ? "Reference is required" : false,
                 })}
               />
               {errors.reference && (
